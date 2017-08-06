@@ -305,7 +305,7 @@ ap mf ma = do
   pure (f a)
 ```
 
-If `m` is a law-abiding member of the `Monad` type class, then there is a valid `Applicative` instance for `apply` is given by `ap`.
+If `m` is a law-abiding member of the `Monad` type class, then there is a valid `Applicative` instance for `m` given by `ap`.
 
 The interested reader can check that `ap` agrees with `apply` for the monads we have already encountered: `Array`, `Maybe` and `Either e`.
 
@@ -509,7 +509,7 @@ Note that we don't have to give a type for `main`. `psc` will find a most genera
 
 ## The Kind of Eff
 
-The type of `main` is unlike other types we've seen before. To explain it, we need to consider the _kind_ of `Eff`. Recall that types are classified by their kinds just like values are classified by their types. So far, we've only seen kinds built from `*` (the kind of types) and `->` (which builds kinds for type constructors).
+The type of `main` is unlike other types we've seen before. To explain it, we need to consider the _kind_ of `Eff`. Recall that types are classified by their kinds just like values are classified by their types. So far, we've only seen kinds built from `Type` (the kind of types) and `->` (which builds kinds for type constructors).
 
 To find the kind of `Eff`, use the `:kind` command in PSCi:
 
@@ -517,22 +517,22 @@ To find the kind of `Eff`, use the `:kind` command in PSCi:
 > import Control.Monad.Eff
 
 > :kind Eff
-# ! -> * -> *
+# Control.Monad.Eff.Effect -> Type -> Type
 ```
 
-There are two symbols here that we have not seen before.
+There are two kinds here that we have not seen before.
 
-`!` is the kind of _effects_, which represents _type-level labels_ for different types of side-effects. To understand this, note that the two labels we saw in `main` above both have kind `!`:
+`Control.Monad.Eff.Effect` is the kind of _effects_, which represents _type-level labels_ for different types of side-effects. To understand this, note that the two labels we saw in `main` above both have kind `Control.Monad.Eff.Effect`:
 
 ```text
 > import Control.Monad.Eff.Console
 > import Control.Monad.Eff.Random
 
 > :kind CONSOLE
-!
+Control.Monad.Eff.Effect
 
 > :kind RANDOM
-!
+Control.Monad.Eff.Effect
 ```
 
 The `#` kind constructor is used to construct kinds for _rows_, i.e. unordered, labelled sets.
@@ -560,7 +560,7 @@ fullName :: forall r. { firstName :: String, lastName :: String | r } -> String
 fullName person = person.firstName <> " " <> person.lastName
 ```
 
-The kind of the type on the left of the function arrow must be `*`, because only types of kind `*` have values.
+The kind of the type on the left of the function arrow must be `Type`, because only types of kind `Type` have values.
 
 The curly braces are actually syntactic sugar, and the full type as understood by the PureScript compiler is as follows:
 
@@ -572,7 +572,7 @@ Note that the curly braces have been removed, and there is an extra `Record` con
 
 ```text
 > :kind Record
-# * -> *
+# Type -> Type
 ```
 
 That is, `Object` is a type constructor which takes a _row of types_ and constructs a type. This is what allows us to write row-polymorphic functions on records.
@@ -789,7 +789,7 @@ There are a number of PureScript packages for working directly with the DOM, or 
 There are also PureScript libraries which build abstractions on top of these libraries, such as
 
 - [`purescript-thermite`](http://github.com/paf31/purescript-thermite), which builds on `purescript-react`, and
-- [`purescript-halogen`](http://github.com/slamdata/purescript-halogen) which provides a type-safe set of abstractions on top of the [`virtual-dom`](http://github.com/Matt-Esch/virtual-dom) library.
+- [`purescript-halogen`](http://github.com/slamdata/purescript-halogen) which provides a type-safe set of abstractions on top of a custom virtual DOM library.
 
 In this chapter, we will use the `purescript-react` library to add a user interface to our address book application, but the interested reader is encouraged to explore alternative approaches.
 
